@@ -8,66 +8,73 @@ The purpose of this analysis is to refactor a solution code to make it more effi
 You can see that the code took about .8 and .7 seconds to execute.  While this code worked well for a data sheet of 12 stocks, it may not work as well for thousands of stocks.  In this analysis,  I will refactor my first script to only loop through the rows once.  I will evalute the results of my code and determine how the refactor helped it execute more efficiently.  The output of the code will then help me compare stock information, which can provide valuable insights into investments.
 ## Results
 In my refactor,  I looped through each row of data once in order to speed up the code execution time.  I did this be creating a variable called "ticker index", and set it to 0.  The ticker index will be used to loop through the arrays made for ticker name, ticker volume, ticker starting price, and ticker ending prices.  I created a for loop to initialize stock volume item in the array to 0.  I ended that for loop and created another for loop to loop through each row in the data sheet, and assign cell values in the array based off certain conditions using "If then" statements.  The last "if then" statement in the for loop increased the ticker index by 1, indicating to assign values to the next ticker name.  I ended that for loop, and created one last for loop to output the array values on a spreadsheet.  An example for my code is below:<br />
- 
-    '1a) Create a ticker Index
+    
+    '1a) Create a ticker Index and set to 0
+    
     Dim tickerIndex As Integer
     tickerIndex = 0
 
     '1b) Create three output arrays
-    Dim tickerVolumes(12) As Long
-    Dim tickerStartingPrices(12) As Single
-    Dim tickerEndingPrices(12) As Single
     
+    Dim tickersVolume(12) As Long
+    Dim startingPrices(12) As Single
+    Dim endingPrices(12) As Single
+
     ''2a) Create a for loop to initialize the tickerVolumes to zero.
+    'the loop will increase the ticker index and set all volumes in the array to 0
     
     For i = 0 To 11
-        tickerVolumes(i) = 0
+        tickersVolume(tickerIndex + i) = 0
     Next i
-    
+
     ''2b) Loop over all the rows in the spreadsheet.
     For i = 2 To RowCount
-        Cells(i, 1).Value = tickerName
-        Cells(i, 8).Value = currentVolume
-       
+   
         '3a) Increase volume for current ticker
-             If tickerName = tickers(tickerIndex) Then
-            tickerVolumes(tickerIndex) = tickerVolumes(tickerIndex) + currentVolume
-            End If
-        
+        If Cells(i, 1).Value = tickers(tickerIndex) Then
+        tickersVolume(tickerIndex) = tickersVolume(tickerIndex) + Cells(i, 8).Value
+        End If
+       
         '3b) Check if the current row is the first row with the selected tickerIndex.
+        'if it is the first row, set the value to the starting price
         'If  Then
-        
-            If tickerName = tickers(tickerIndex) And tickerName - 1 <> tickers(tickerIndex) Then
-            tickerStartingPrices(tickerIndex) = Cells(j, 6).Value
+            
+            If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i - 1, 1).Value <> tickers(tickerIndex) Then
+            startingPrices(tickerIndex) = Cells(i, 6).Value
             End If
         
         '3c) check if the current row is the last row with the selected ticker
-         'If the next row‚Äôs ticker doesn‚Äôt match, increase the tickerIndex.
+         'if it is the last row, set the value to the ending price
         'If  Then
-             If tickerName = tickers(tickerIndex) And tickerName + 1 <> tickers(tickerIndex) Then
-            tickerEndingPrices(tickerIndex) = Cells(j, 6).Value
-            End If
             
- 
-            '3d Increase the tickerIndex.
-             If tickerName = tickers(tickerIndex) And tickerName + 1 <> tickers(tickerIndex) Then
-            tickerIndex = tickerIndex + 1
-            End If
+                 If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
+                endingPrices(tickerIndex) = Cells(i, 6).Value
+                End If
+
+            '3d Increase the tickerIndex
+            'the ticker index will increase by 1 for the same criteria as the ending price, so it it is the last row of the current ticker
+            
+            
+               If Cells(i, 1).Value = tickers(tickerIndex) And Cells(i + 1, 1).Value <> tickers(tickerIndex) Then
+                 tickerIndex = tickerIndex + 1
+                End If
+            
+        'End If
+    
     Next i
  
     '4) Loop through your arrays to output the Ticker, Total Daily Volume, and Return.
+    'the for loop will have i loop through the arrays andplace the values in the cells stated below
+    'the row of the cell we are placing the value in will also increase by i increase
+    
     For i = 0 To 11
         
-        Worksheets("All Stock Analysis").Activate
+        Worksheets("All Stocks Analysis").Activate
         
-        Cells(4 + i, 1).Value = tickers(tickerIndex)
-        Cells(4 + i, 2).Value = tickerVolumes(tickerIndex)
-        Cells(4 + i, 3).Value = tickerEndingPrices(tickerIndex) / tickerStartingPrices(tickerIndex) - 1
-     
-    Next i
-
-
-
+        Cells(4 + i, 1).Value = tickers(i)
+        Cells(4 + i, 2).Value = tickersVolume(i)
+        Cells(4 + i, 3).Value = endingPrices(i) / startingPrices(i) - 1
+        
 After my refactor with the above code, I was able to execute the analysis in a shorter amount of time, as seen below: <br />
 <img width="1440" alt="VBA_Challenge_2017" src="https://user-images.githubusercontent.com/63257696/116462008-fbbb7980-a836-11eb-9ef4-76087aa97f19.png">
 <img width="1440" alt="VBA_Challenge_2018" src="https://user-images.githubusercontent.com/63257696/116462020-feb66a00-a836-11eb-96b7-2e9a124e5a46.png">
